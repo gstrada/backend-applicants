@@ -34,7 +34,7 @@ class FindUsersController
         // para que siga las notas del documento de requisitos
         $localUsers = $this->localUsersRepository->findByLogin($login, $limit);
         $githubUsers = $this->gitHubUsersRepository->findByLogin($login, $limit);
-
+        
         $users = $localUsers->merge($githubUsers)->map(function (User $user) {
             return [
                 'id' => $user->getId()->getValue(),
@@ -47,7 +47,7 @@ class FindUsersController
                 ]
             ];
         });
-
+        
         $response->getBody()->write($users->toJson());
 
         return $response->withHeader('Content-Type', 'application/json')

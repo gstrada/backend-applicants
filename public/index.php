@@ -29,6 +29,24 @@ $container->set(GitHubUsersRepository::class, function () {
 // application
 AppFactory::setContainer($container);
 $app = AppFactory::create();
+
+//Función agregada para poder correr slim framework en entorno local en un subdirectorio
+$app->setBasePath(
+    (function ()
+        {
+            $scriptDir = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME']));
+            $uri = (string) parse_url('http://a' . $_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH);
+            if (stripos($uri, $_SERVER['SCRIPT_NAME']) === 0) {
+                return $_SERVER['SCRIPT_NAME'];
+            }
+            if ($scriptDir !== '/' && stripos($uri, $scriptDir) === 0) {
+                return $scriptDir;
+            }
+            return '';
+        }
+    )()
+);
+
 $app->add(new WhoopsMiddleware(['enable' => env('API_ENV') === 'local']));
 
 // routes
